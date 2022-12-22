@@ -1,0 +1,23 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  font-size: calc(0.3rem + 1vw);
+  background-color: #e9d5da;
+}
+
+.nav {
+  font-size: calc(0.3rem + 1vw);
+}
+
+.navbar {
+  background-color: #001d6e;
+}
+
+.footer {
+  background-color: #001d6e;
+}
+
+/* 
+*/

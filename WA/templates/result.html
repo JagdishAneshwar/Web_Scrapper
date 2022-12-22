@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% load static %}
+<div class="mt-5 pt-5">
+  <div class="result">
+    {% autoescape off %}
+      {{ data }}
+    {% endautoescape %}
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% load static %}
+<form  class="card container" method="post">
+  {% csrf_token %}
+  <div class="row g-0 form-container">
+  <div class="form-img col-6">  <img src="{% static 'login.jpg' %}" alt="MyImage" id="form-img"></div>
+  <div class="signupform col-6">
+  <fieldset>
+    <legend class="title" style = "border-bottom: 1px solid gray;">Log In</legend>
+    <div class="form-group">
+    <fieldset>
+      <label class="form-label" for="username">User Name</label>
+      <input class="form-control col-4" name="user" id="username" type="text">
+    </fieldset>
+  </div>
+    <div class="form-group">
+      <label for="exampleInputPassword1" class="form-label mt-4">Password</label>
+      <input type="password" name="pwd" class="form-control" id="exampleInputPassword1">
+    </div>
+<button type="submit" class="btn mt-4">Log In</button>
+</div>
+  </div>
+</form>
+
+{% endblock %}

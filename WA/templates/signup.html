@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% load static %}
+<form class="card container" method="post">
+  {% csrf_token %}
+  <div class="row g-0 form-container">
+  <div class="form-img col-6">  <img src="{% static 'signup-img.jpg' %}" alt="MyImage" id="form-img"></div>
+<div class="signupform col-6">
+  <fieldset>
+    <legend class="title" >Sign Up</legend>
+    <div class="form-group"> 
+    <fieldset>
+      <label class="form-label" for="username" >User Name</label>
+      <input class="form-control col-4" name="name" id="username" type="text" >
+    </fieldset>
+  </div>
+    <div class="form-group">
+      <label for="exampleInputEmail1" class="form-label mt-4">Email address</label>
+      <input type="email" class="form-control" name="email" id="exampleInputEmail1" aria-describedby="emailHelp">
+      <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+    </div>
+    <div class="form-group">
+      <label for="exampleInputPassword1" class="form-label mt-4">Password</label>
+      <input type="password" class="form-control" name="pwd" id="exampleInputPassword1">
+      <label for="exampleInputPassword1" class="form-label mt-4">Confirm Password</label>
+      <input type="password" class="form-control" name="pwd2" id="exampleInputPassword1">
+    </div>
+    <div class="mt-3">
+      {% for message in messages %}
+      <h3 class=" text-danger"><b>{{message}}</b></h3>
+      {% endfor %}
+    </div>
+
+<button type="submit" class="btn mt-4">Sign Up</button>
+</div>
+</div>
+</form>
+
+{% endblock %}
