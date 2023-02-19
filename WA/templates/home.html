@@ -2,64 +2,32 @@
 
 {% block content %}
 {% load static %}
-<main>
-    <form class="form-group w-50 position-absolute top-0 ps-3 pt-5 mt-5" action="{% url 'result' %}" method="POST">
-      {% csrf_token %}
-      <label for="">URL</label>
-      <input type="text" class="form-control" name="url_pattern" aria-label="Text input with dropdown button">
-    
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#exampleModal">
-     Add Tag
-    </button>
-    
-    <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-    <div class="result">
-        {% for item in tags %}
 
-            <div class="w-100 h-100">
-                <p>{{item}}</p>
-            </div>
+
+<form method="post" action="{% url 'home' %}">
+  {% csrf_token %}
+  <label for="url">URL:</label>
+  <input type="text" name="url" id="url">
+  <input type="submit" value="Add Tag">
+</form>
+
+    
+<div id="tags_table">
+  <table>
+      <thead>
+        <tr>
+          <th>URL</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tag in lis %}
+        <tr>
+          <td><a href="{% url 'tag' tag.pk %}">{{ tag.url }}</a></td>
+        </tr>
         {% endfor %}
-    </div>
-        <!-- Modal -->
-        <form class="modal fade" id="exampleModal" action="{% url 'create_tag' %}" method="POST" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          {% csrf_token %}
-          <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Tag</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-      
-              <select class="form-select mb-2" aria-label="Default select example" name="element_dropdown">
-                <option selected disable>Select Element</option>
-                <option value="body">body</option>
-                <option value="div">div</option>
-                <option value="span">span</option>
-                <option value="img">image</option>
-                <option value="p">p</option>
-              </select>
-      
-              <div class="input-group mb-3">
-                <select class="form-select" aria-label="Default select example" name="attr_dropdown">
-                  <option selected disable>Attribute</option>
-                  <option value="id">id</option>
-                  <option value="class">class</option>
-                </select>
-                <input type="text" class="form-control" name="value" aria-label="Text input with dropdown button">
-              </div>
-      
-      
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-primary">Save changes</button>
-            </div>
-          </div>
-        </div>
-      </form>
-    </main>
+      </tbody>
+    </table>
+    
+</div>
+
     {% endblock %}

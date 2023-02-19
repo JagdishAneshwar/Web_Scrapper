@@ -1,152 +1,136 @@
 
-from django.shortcuts import render,redirect, HttpResponseRedirect
+from django.shortcuts import render,redirect, get_object_or_404
 from django.contrib.auth.models import User, auth
-from django.core.mail import send_mail
 from django.contrib import messages
-import requests # pip install requests
-from bs4 import BeautifulSoup as bs # pip install beautifulsoup4
-import pandas as pd
+from .models import Tag, URLS
+from .form import TagForm, URLForm
 
-# Create your views here.
-def about(request):
-    return render(request, 'base.html', {})   
+
+
 
 def home(request):
-    return render(request, 'home.html', {})
+	if request.method == 'POST':
+		form = URLForm(request.POST)
+		if form.is_valid():
+			url = form.cleaned_data['url']
+			existing_url = URLS.objects.filter(user=request.user, url=url).first()
+			if not existing_url:
+				new_url = URLS(user=request.user, url=url)
+				new_url.save() 
+			lis = URLS.objects.filter(user=request.user)
+			return render(request, 'home.html', {'lis' : lis})
+		lis = URLS.objects.filter(user=request.user)
+		return render(request, 'home.html', {'lis' : lis})
+	else:
+		lis = URLS.objects.filter(user=request.user)
+		return render(request, 'home.html', {'lis' : lis})
+
+def tag(request, pk):
+    url = get_object_or_404(URLS, pk=pk, user=request.user)
+    if request.method == 'POST':
+        form = TagForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data['title']
+            element = form.cleaned_data['element']
+            attribute = form.cleaned_data['attribute']
+            value = form.cleaned_data['value']
+            existing_tag = Tag.objects.filter(user=url, title=title, element=element, attribute=attribute, value=value).first()
+            if not existing_tag:
+                new_tag = Tag(user=url, title=title, element=element, attribute=attribute, value=value)
+                new_tag.save() 
+            lis = Tag.objects.filter(user=url)
+            return render(request, 'tags.html', {'lis' : lis})
+        lis = Tag.objects.filter(user=url)
+        return render(request, 'tags.html', {'lis' : lis})
+    else:
+        lis = Tag.objects.filter(user=url)
+        return render(request, 'tags.html', {'lis' : lis})
+
+
 
 def signup(request):
-    if request.method == 'POST':
-        username = request.POST['name']
-        password1 = request.POST['pwd']
-        password2 = request.POST['pwd2']
-        email = request.POST['email']
-        if password1 == password2:
-            if User.objects.filter(username=username).exists():
-                messages.info(request, "Username is Already Taken!!")
-                return redirect('signup.html')
-            else:
-                user = User.objects.create_user(username=username, password=password1, email=email)
-                user.save()
-                user = auth.authenticate(username=username, password=password1)
-                auth.login(request, user)
-                return redirect('home.html')
+	if request.method == 'POST':
+		username = request.POST['name']
+		password1 = request.POST['pwd']
+		password2 = request.POST['pwd2']
+		email = request.POST['email']
+		if password1 == password2:
+			if User.objects.filter(username=username).exists():
+				messages.info(request, "Username is Already Taken!!")
+				return redirect('signup.html')
+			else:
+				user = User.objects.create_user(username=username, password=password1, email=email)
+				user.save()
+				user = auth.authenticate(username=username, password=password1)
+				auth.login(request, user)
+				return redirect('home.html')
 
-        else:
-            messages.info(request, "Password didn't match!!")
-            return redirect('signup.html')
+		else:
+			messages.info(request, "Password didn't match!!")
+			return redirect('signup.html')
 
-    else:
-        return render(request, 'signup.html', {})
+	else:
+		return render(request, 'signup.html', {})
+
+def delete_tag(request, item_id):
+	if request.method == 'POST':
+		dl = Tag.objects.get(pk=item_id)
+		dl.delete()
+		return redirect('/tags.html')
 
 def login(request):
-    if request.method == 'POST':
-        username = request.POST['user']
-        password = request.POST['pwd']
-        user = auth.authenticate(username=username, password=password)
-        if user is not None:
-            auth.login(request, user)
-            return redirect('home.html')
-        else:
-            messages.info(request, "Password or Username Is Wrong!!")
-            return redirect('login.html')
-    else:
-        return render(request, 'login.html', {})
+	if request.method == 'POST':
+		username = request.POST['user']
+		password = request.POST['pwd']
+		user = auth.authenticate(username=username, password=password)
+		if user is not None:
+			auth.login(request, user)
+			return redirect('home.html')
+		else:
+			messages.info(request, "Password or Username Is Wrong!!")
+			return redirect('login.html')
+	else:
+		return render(request, 'login.html', {})
 
-data=[]
-raw_data=[]
-raw=[]
+
+from django.shortcuts import render, get_object_or_404
+import requests
+import pandas as pd
+from bs4 import BeautifulSoup
+
+
 def result(request):
-    if request.method == 'POST':
-        URL = request.POST.get('url_pattern')
-        element = request.POST.get('element_dropdown')
-        attribute = request.POST.get('attr_dropdown')
-        value = request.POST.get('value')
+	if request.method == 'POST':
+		user_url = URLS.objects.filter(user=request.user).first()
+		if not user_url:
+			# Handle the case where the user has not added any URL
+			return render(request, 'result.html', {'result_data': []})
+		lis = Tag.objects.filter(user=user_url)
+		text_list = []
+		img_list=[]
+		tag_results=[]
+		for tag in lis:
+			element = tag.element
+			attribute = tag.attribute
+			value = tag.value
+			page = requests.get(user_url.url)
+			soup = BeautifulSoup(page.content, 'html.parser')
+			
+			if element == 'img':
+				# Handle image tags separately
+				img_list = [f"<img src='{img['src']}' />" for img in soup.find_all(element, {attribute: value})]
+				tag_results.append(img_list)
+			else:
+				text_list = soup.find_all(element, {attribute: value})
+				tag_results.append(text_list)
 
-        if len(tags) == 0:
-            tags.append([element, attribute, value])
-            r = requests.get(URL)
-            soup = bs(r.content)
-            new_list = [d for d in tags if None not in d]
-            print("new_list", new_list)
-            for i in range(len(new_list)):
-                #print(new_list[i])
-                if new_list[i][0] == "img":
-                    img_temp=soup.find_all(new_list[i][0], attrs={new_list[i][1]: new_list[i][2]})
-                    img_list=[link["src"] for link in img_temp]
-                    #print(img_temp)
-                else:
-                    raw_data.append(soup.find_all(new_list[i][0], attrs={new_list[i][1]: new_list[i][2]}))
-                #print("raw_data", raw_data)
-            for el in range(len(raw_data)):
-                raw_data[el]
-                temp=[]
-                for product in raw_data[el]:
-                        temp.insert(el, product.get_text())
-                raw.append(temp)
-            for i in range(len(new_list)):
-                if new_list[i][0] == "img":
-                    raw.append(img_list)
-            #print("raw", raw)
-            df = pd.DataFrame(raw).T
-            df.drop(df.columns[[0, 1]], axis=1, inplace=True)
-            html_table=df.to_html(index=False, classes=["table"])
-            #print(html_table)
-            return render(request, 'result.html', {"data":html_table})
-        elif len(tags) != 0:
-            if element != tags[-1][0] and attribute != tags[-1][1] and value != tags[-1][2]:
-                tags.append([element, attribute, value])
-                r = requests.get(URL)
-                soup = bs(r.content)
-                new_list = [d for d in tags if None not in d]
-                print("new_list", new_list)
-                for i in range(len(new_list)):
-                    if new_list[i][0] == "img":
-                        img_temp=soup.find_all(new_list[i][0], attrs={new_list[i][1]: new_list[i][2]})
-                        img_list=[link["src"] for link in img_temp]
-                        #print(img_temp)
-                    else:
-                        raw_data.append(soup.find_all(new_list[i][0], attrs={new_list[i][1]: new_list[i][2]}))
-                        #print("raw_data", raw_data)
-                for el in range(len(raw_data)):
-                    raw_data[el]
-                    temp=[]
-                    for product in raw_data[el]:
-                            temp.insert(el, product.get_text())
-                    raw.append(temp)
-                for i in range(len(new_list)):
-                    if new_list[i][0] == "img":
-                        raw.append(img_list)
-                #print("raw", raw)
-                df = pd.DataFrame(raw).T
-                df.drop(df.columns[[0, 1]], axis=1, inplace=True)
-                html_table=df.to_html(index=False, classes=["table"])
-                #print(html_table)
-                return render(request, 'result.html', {"data":html_table})
-            else:
-                return render(request, 'result.html', {"data":html_table})
-        return render(request, 'result.html', {"data":html_table})
-    else:
-        return render(request, 'result.html', {})
+		# Here you can process the tag_result_data as per your requirement
+		df = pd.DataFrame(tag_results).T
+		html_table = df.to_html(index=False, escape=False, classes=["table"])
+		return render(request, 'result.html', {'html_table': html_table})
+	else:
+		tag_results = Tag.objects.filter(user=request.user)
+		df = pd.DataFrame(tag_results).T
+		html_table = df.to_html(index=False, escape=False, classes=["table"])
+		return render(request, 'result.html', {'html_table': html_table})
 
-tags=[]
-def create_tag(request):
-    if request.method == 'POST':
-        element = request.POST.get('element_dropdown')
-        attribute = request.POST.get('attr_dropdown')
-        value = request.POST.get('value')
-        #print(len(tags))
-        if len(tags) == 0:
-            tags.append([element, attribute, value])
-            #print(tags)
-            return render(request, 'home.html', {'tags':tags})
-        elif len(tags) != 0:
-            if element != tags[-1][0] and attribute != tags[-1][1] and value != tags[-1][2]:
-                tags.append([element, attribute, value])
-#print(tags)
-                return render(request, 'home.html', {'tags':tags})
-            else:
-                return render(request, 'home.html', {'tags':tags})
-
-        return render(request, 'home.html', {})
-    else:
-        return render(request, 'home.html', {})

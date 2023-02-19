@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% load static %}
+
+
+<form method="post">
+    {% csrf_token %}
+    <label for="element">Element:</label>
+    <input type="text" name="element" id="element">
+
+    <label for="attribute">Attribute:</label>
+    <input type="text" name="attribute" id="attribute">
+
+    <label for="title">Title:</label>
+    <input type="text" name="title" id="title">
+
+    <label for="value">Value:</label>
+    <input type="text" name="value" id="value">
+
+    <input type="submit" value="Add Tag">
+</form>
+
+
+<div id="tags_table">
+    <table>
+        <thead>
+          <tr>
+            <th>Element</th>
+            <th>Attribute</th>
+            <th>Title</th>
+            <th>Value</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tag in lis %}
+          <tr>
+            <td>{{ tag.element }}</td>
+            <td>{{ tag.attribute }}</td>
+            <td>{{ tag.title }}</td>
+            <td>{{ tag.value }}</td>
+            <td>
+              <form action="{% url 'delete_tag' tag.id %}" method="POST" class="d-inline">
+              {% csrf_token %}
+              <input type="submit" value="delete" class="btn btn-outline-danger">
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+</div>
+
+<div>
+  <form method="post" action="{% url 'result' %}">
+    {% csrf_token %}
+    <input type="submit" value="Generate">
+  </form>
+
+</div>
+
+{% endblock %}
