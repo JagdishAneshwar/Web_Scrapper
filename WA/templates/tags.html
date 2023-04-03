@@ -21,6 +21,32 @@
     <input type="submit" value="Add Tag">
 </form>
 
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Save</button>
+</form>
+<table>
+  <thead>
+    <tr>
+      <th>Nav Element</th>
+      <th>Nav Attribute</th>
+      <th>Nav Title</th>
+      <th>Nav Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for navurl in navurls %}
+      <tr>
+        <td>{{ navurl.navelement }}</td>
+        <td>{{ navurl.navattribute }}</td>
+        <td>{{ navurl.navtitle }}</td>
+        <td>{{ navurl.navvalue }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
 
 <div id="tags_table">
     <table>
@@ -34,7 +60,7 @@
           </tr>
         </thead>
         <tbody>
-          {% for tag in lis %}
+          {% for tag in taglis %}
           <tr>
             <td>{{ tag.element }}</td>
             <td>{{ tag.attribute }}</td>

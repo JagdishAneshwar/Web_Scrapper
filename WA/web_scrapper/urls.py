@@ -10,4 +10,5 @@ urlpatterns = [
     path('tags.html/<int:pk>/', views.tag, name='tag'),
     path('result.html', views.result, name='result'),
     path('delete_tag/<item_id>', views.delete_tag, name='delete_tag'),
+    path('submit/', views.result, name='filter'),
 ]

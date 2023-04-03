@@ -11,3 +11,10 @@ class Tag(models.Model):
     attribute = models.CharField(max_length=255)
     title = models.CharField(max_length=255)
     value = models.CharField(max_length=255)
+
+class NavURLS(models.Model):
+    user = models.ForeignKey(URLS, related_name="navurls", on_delete=models.CASCADE, null=True)
+    navelement = models.CharField(max_length=255)
+    navattribute = models.CharField(max_length=255)
+    navtitle = models.CharField(max_length=255)
+    navvalue = models.CharField(max_length=255555)

@@ -3,6 +3,13 @@
 
 {% block content %}
 {% load static %}
+<div>
+  <form method="post" action="{% url 'filter' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+</form>
+</div>
 
 <div class="mt-5 pt-5">
   <div class="result">
