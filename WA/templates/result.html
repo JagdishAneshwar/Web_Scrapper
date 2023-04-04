@@ -3,13 +3,31 @@
 
 {% block content %}
 {% load static %}
-<div>
-  <form method="post" action="{% url 'filter' %}">
+<div class="m-3">
+  <form method="post"  action="{% url 'pkresult' pk %}" class="row">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit</button>
+    <label for="page" class="mb-1 col">Pages:</label>
+    <input type="number" name="page" id="page" class="form-control mb-3 col-11">
+    <input type="submit" value="Apply"/>
 </form>
 </div>
+
+<div>
+  <form method="post" action="{% url 'download_csv' pk=pk %}">
+    {% csrf_token %}
+    <label for="format">Select format:</label>
+    <input type="radio" id="csv" name="format" value="csv" checked>
+    <label for="csv">CSV</label>
+    <input type="radio" id="json" name="format" value="json">
+    <label for="json">JSON</label>
+    <br>
+    <button type="submit">Download</button>
+  </form>
+</div>
+
+
+
+
 
 <div class="mt-5 pt-5">
   <div class="result">

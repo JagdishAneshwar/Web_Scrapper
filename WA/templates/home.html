@@ -4,25 +4,31 @@
 {% load static %}
 
 
-<form method="post" action="{% url 'home' %}">
+<form method="post" action="{% url 'home' %}" class="row m-3">
   {% csrf_token %}
-  <label for="url">URL:</label>
-  <input type="text" name="url" id="url">
-  <input type="submit" value="Add Tag">
+  <div class="form-group col-1 justify-content-end">
+    <label for="url">URL:</label>
+  </div>
+  <div class="form-group col-8">
+    <input type="text" name="url" id="url" class="form-control">
+  </div>
+  <input type="submit" value="Add Tag" class="btn btn-primary col">
 </form>
 
+
+
     
-<div id="tags_table">
-  <table>
+<div id="tags_table" class="m-3">
+  <table  class="table table-bordered table-light table-hover">
       <thead>
         <tr>
           <th>URL</th>
         </tr>
       </thead>
       <tbody>
-        {% for tag in lis %}
+        {% for url in lis %}
         <tr>
-          <td><a href="{% url 'tag' tag.pk %}">{{ tag.url }}</a></td>
+          <td class="p-3"><a href="{% url 'pktag' url.pk %}"  style="text-decoration: none; color: inherit;">{{ url.url }}</a></td>
         </tr>
         {% endfor %}
       </tbody>

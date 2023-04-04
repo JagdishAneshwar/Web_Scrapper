@@ -1,31 +1,53 @@
 {% extends "base.html" %}
-
+<script>
+  function submitForm(event) {
+    event.preventDefault(); // Prevent form submission
+    document.getElementById("nav-form").style.display = "none"; // Hide form
+  }
+  </script>
 {% block content %}
 {% load static %}
+{% load bootstrap4 %}
+
+<div class="m-3" >
+
+<div class="row pt-3 ms-1 me-1">
+  <div class="col">
+    
+  <form method="post" class="col"  action="{% url 'pktag' pk %}">
+    <h3>Tag</h3>
+      {% csrf_token %}
+      <label for="element" class="mb-1">Element:</label>
+      <input type="text" name="element" id="element" class="form-control mb-3">
+      <label for="attribute" class="mb-1">Attribute:</label>
+      <input type="text" name="attribute" id="attribute" class="form-control mb-3">
+      <label for="title" class="mb-1">Title:</label>
+      <input type="text" name="title" id="title" class="form-control mb-3">
+      <label for="value" class="mb-1">Value:</label>
+      <input type="text" name="value" id="value" class="form-control mb-3">
+      <button type="submit" class="btn btn-primary">Add Tag</button>
+  </form>
+</div>
+
+<div class="col">
+  
+  <form method="post" class="col" id="nav-form" onsubmit="submitForm(event)" action="{% url 'pktag' pk %}">
+    <h3>Navigation</h3>
+      {% csrf_token %}
+      <label for="navelement" class="mb-1">Element:</label>
+      <input type="text" name="navelement" id="navelement" class="form-control mb-3">
+      <label for="navattribute" class="mb-1">Attribute:</label>
+      <input type="text" name="navattribute" id="navattribute" class="form-control mb-3">
+      <label for="navtitle" class="mb-1">Title:</label>
+      <input type="text" name="navtitle" id="navtitle" class="form-control mb-3">
+      <label for="navvalue" class="mb-1">Value:</label>
+      <input type="text" name="navvalue" id="navvalue" class="form-control mb-3">
+    <button type="submit" class="btn btn-primary" onclick="hideForm(); return false;">Add Nav</button>
+  </form>
+</div>
+</div>
 
 
-<form method="post">
-    {% csrf_token %}
-    <label for="element">Element:</label>
-    <input type="text" name="element" id="element">
-
-    <label for="attribute">Attribute:</label>
-    <input type="text" name="attribute" id="attribute">
-
-    <label for="title">Title:</label>
-    <input type="text" name="title" id="title">
-
-    <label for="value">Value:</label>
-    <input type="text" name="value" id="value">
-
-    <input type="submit" value="Add Tag">
-</form>
-
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Save</button>
-</form>
 <table>
   <thead>
     <tr>
@@ -79,11 +101,12 @@
 </div>
 
 <div>
-  <form method="post" action="{% url 'result' %}">
+  <form method="post" action="{% url 'pkresult' pk %}">
     {% csrf_token %}
     <input type="submit" value="Generate">
   </form>
 
+</div>
 </div>
 
 {% endblock %}
