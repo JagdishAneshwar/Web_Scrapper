@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base2.html" %}
 <script>
   function submitForm(event) {
     event.preventDefault(); // Prevent form submission
@@ -47,13 +47,16 @@
 </div>
 </div>
 
-
-<table>
+<div class="pt-3">
+<div id="tags_table" class="m-3">
+  <h3>Navigation</h3><hr>
+<table  class="table table-bordered table-light table-hover mt-3">
   <thead>
     <tr>
       <th>Nav Element</th>
       <th>Nav Attribute</th>
       <th>Nav Title</th>
+      <th>Nav Value</th>
       <th>Nav Value</th>
     </tr>
   </thead>
@@ -64,14 +67,22 @@
         <td>{{ navurl.navattribute }}</td>
         <td>{{ navurl.navtitle }}</td>
         <td>{{ navurl.navvalue }}</td>
+        <td>
+          <form action="{% url 'delete_navurl' navurl.id %}" method="POST" class="d-inline">
+          {% csrf_token %}
+          <input type="submit" value="delete" class="btn btn-outline-danger">
+          </form>
+        </td>
       </tr>
-    {% endfor %}
+      {% endfor %}
   </tbody>
 </table>
+</div>
 
 
-<div id="tags_table">
-    <table>
+<div id="tags_table" class="m-3">
+  <h3>Tags</h3><hr>
+    <table  class="table table-bordered table-light table-hover">
         <thead>
           <tr>
             <th>Element</th>
@@ -98,13 +109,14 @@
           {% endfor %}
         </tbody>
       </table>
+      <div>
+        <form method="post" action="{% url 'pkresult' pk %}">
+          {% csrf_token %}
+          <input type="submit" value="Generate" class="btn btn-primary" >
+        </form>
+      
+      </div>
 </div>
-
-<div>
-  <form method="post" action="{% url 'pkresult' pk %}">
-    {% csrf_token %}
-    <input type="submit" value="Generate">
-  </form>
 
 </div>
 </div>

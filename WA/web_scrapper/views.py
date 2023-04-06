@@ -90,10 +90,24 @@ def signup(request):
 
 
 def delete_tag(request, item_id):
+    url = get_object_or_404(URLS, pk=item_id, user=request.user)
     if request.method == 'POST':
+        form = NavURLForm()
         dl = Tag.objects.get(pk=item_id)
         dl.delete()
-        return render(request, 'tags.html', {'pk':item_id})
+        taglis = Tag.objects.filter(user=url)
+        navurllis = NavURLS.objects.filter(user=url)
+        return render(request, 'tags.html', {'form': form, 'taglis': taglis, 'navurls': navurllis, 'pk':item_id})
+
+
+def delete_navurl(request, item_id):
+    url = get_object_or_404(URLS, pk=item_id, user=request.user)
+    if request.method == 'POST':
+        dl = NavURLS.objects.get(pk=item_id)
+        dl.delete()
+        taglis = Tag.objects.filter(user=url)
+        navurllis = NavURLS.objects.filter(user=url)
+        return render(request, 'tags.html', {'form': form, 'taglis': taglis, 'navurls': navurllis, 'pk':item_id})
 
 
 def login(request):
@@ -133,20 +147,23 @@ def result(request, pk):
                     df = process('', lis, int(page), tag_results, url)
                 else:
                     df = process('', lis, int(3), tag_results, url)
-            html_table = df.to_html(index=False, escape=False, classes=["table"])
+            html_table = df.to_html(index=False, escape=False, classes=["table table-light table-hover table-bordered p-2"])
             return render(request, 'result.html', {'html_table': html_table, 'form': form, 'pk':pk})
         df = process(nav_urls, lis, int(3), tag_results, url)
-        html_table = df.to_html(index=False, escape=False, classes=["table"])
+        html_table = df.to_html(index=False, escape=False, classes=["table table-light table-hover table-bordered p-2"])
         return render(request, 'result.html', {'html_table': html_table, 'form': form, 'pk':pk})
     else:
         tag_results = Tag.objects.filter(user=request.user)
         df = pd.DataFrame(tag_results)
-        html_table = df.to_html(index=False, escape=False, classes=["table"])
+        html_table = df.to_html(index=False, escape=False, classes=["table table-light table-hover table-bordered p-2"])
         return render(request, 'result.html', {'html_table': html_table, 'form': form, 'pk': pk})
 
 
 def process(nav_urls, lis, page_val,tag_results, url):
     col_name=[]
+    for tag in lis:
+        col_name.append(tag.title)
+        
     if nav_urls == '':
         page = requests.get(url.url)
         soup = BeautifulSoup(page.content, 'html.parser')
@@ -155,14 +172,11 @@ def process(nav_urls, lis, page_val,tag_results, url):
                 element = tag.element
                 attribute = tag.attribute
                 value = tag.value
-                col_name.append(tag.title)
-                print(element, value )
                 if element == 'img':
                     img_list = [
                         f"<img src='{img['src']}' />" for img in soup.find_all(element, {attribute: value})]
                     temp_results.append(img_list)
                 else:
-                    print(element, attribute, value)
                     text_list = soup.find_all(element, {attribute: value})
                     text_results = []
                     for text_elem in text_list:
@@ -172,6 +186,7 @@ def process(nav_urls, lis, page_val,tag_results, url):
 
         tag_results.extend(zip(*temp_results))
     else:
+
         for nav_url in nav_urls:
             for i in range(0, page_val):
                 temp_results = []
@@ -180,7 +195,7 @@ def process(nav_urls, lis, page_val,tag_results, url):
                 test_url = url[:last_digit_index] + \
                     "{page_number}".format(page_number=i+1)
                 try:
-                    print(test_url)
+                    
                     page = requests.get(test_url)
                     soup = BeautifulSoup(page.content, 'html.parser')
                 except Exception as e:
@@ -189,7 +204,6 @@ def process(nav_urls, lis, page_val,tag_results, url):
                     element = tag.element
                     attribute = tag.attribute
                     value = tag.value
-                    col_name.append(tag.title)
                     if element == 'img':
                         img_list = [
                             f"<img src='{img['src']}' />" for img in soup.find_all(element, {attribute: value})]
@@ -202,8 +216,10 @@ def process(nav_urls, lis, page_val,tag_results, url):
                             text_results.append(text)
                         temp_results.append(text_results)
                 tag_results.extend(zip(*temp_results))
+        
     df = pd.DataFrame(tag_results).dropna()
-
+    print(col_name)
+    df.columns=col_name
     return df
 
 def download_csv(request, pk):

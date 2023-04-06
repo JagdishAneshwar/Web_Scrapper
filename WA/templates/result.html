@@ -1,27 +1,35 @@
-{% extends "base.html" %}
+{% extends "base2.html" %}
 
 
 {% block content %}
 {% load static %}
-<div class="m-3">
-  <form method="post"  action="{% url 'pkresult' pk %}" class="row">
-    {% csrf_token %}
-    <label for="page" class="mb-1 col">Pages:</label>
-    <input type="number" name="page" id="page" class="form-control mb-3 col-11">
-    <input type="submit" value="Apply"/>
+<form class="row g-3 m-3" method="post"  action="{% url 'pkresult' pk %}">
+  {% csrf_token %}
+  <div class="col-auto">
+    <label for="Pages">Pages</label>
+  </div>
+  <div class="col-auto">
+    <input type="number" class="form-control" id="page" name="page" placeholder="pages">
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-primary mb-3">Apply</button>
+  </div>
 </form>
-</div>
 
 <div>
-  <form method="post" action="{% url 'download_csv' pk=pk %}">
+  <form method="post" action="{% url 'download_csv' pk=pk %}" class="row g-3 m-3">
     {% csrf_token %}
+    <div class="col-auto">
     <label for="format">Select format:</label>
-    <input type="radio" id="csv" name="format" value="csv" checked>
-    <label for="csv">CSV</label>
+  </div>
+  <div class="col-auto">
+    <input type="radio" id="csv" name="format" value="csv" checked class="pt-1">
+    <label for="csv">CSV</label></div>
+    <div class="col-auto">
     <input type="radio" id="json" name="format" value="json">
-    <label for="json">JSON</label>
-    <br>
-    <button type="submit">Download</button>
+    <label for="json">JSON</label></div>
+    <div class="col-auto">
+    <input type="submit" value="Download" class="btn btn-primary"></div>
   </form>
 </div>
 
@@ -30,7 +38,7 @@
 
 
 <div class="mt-5 pt-5">
-  <div class="result">
+  <div class="result p-3 text-start">
     {% autoescape off %}
       {{ html_table }}
     {% endautoescape %}
