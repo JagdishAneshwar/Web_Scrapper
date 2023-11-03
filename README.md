@@ -9,7 +9,6 @@ WebScrapper is a web application designed to facilitate web scraping and data ex
 - [Features](#features)
 - [Backend Setup](#backend-setup)
 - [Frontend Setup](#frontend-setup)
-- [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
 
@@ -31,10 +30,6 @@ WebScrapper offers the following key features:
 - User-friendly input interface for adding URLs and applying scraping functionalities.
 - Data extraction from specified web pages with customizable parameters.
 - Downloadable data in various formats, including CSV and JSON.
-
-## Contributing
-
-Contributions to WebScrapper are welcome and encouraged. If you wish to contribute to the project, please follow the guidelines mentioned in the CONTRIBUTING.md file.
 
 ## License
 
